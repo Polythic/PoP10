@@ -10,8 +10,8 @@ let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
 let getNeighbourFeilds (pos : position) : position list =
-  let xc = fst pos
-  let yc = snd pos
+  let xc = snd pos
+  let yc = fst pos
   [(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)]
 
 /// An animal is a base class. It has a position and a reproduction counter.
