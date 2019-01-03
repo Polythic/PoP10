@@ -13,6 +13,10 @@ let getNeighbourFeilds (pos : position) : position list =
   let xc = fst pos
   let yc = snd pos
   [(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)]
+  // TODO check om pos er på en kant af board og udfør funktion af hensyn til det
+
+let getSymbolForPosition (pos: position) (arr: symbol [,]) : symbol =
+  arr.[fst pos, snd pos]
 
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
@@ -116,6 +120,8 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
 
   override this.ToString () =
     let arr = draw _board
+    let testSymbol = getSymbolForPosition (2,3) arr
+    printfn "%A" testSymbol
     let mutable ret = "  "
     for j = 0 to _board.width-1 do
       ret <- ret + string (j % 10) + " "
