@@ -32,6 +32,9 @@ type moose (repLen : int) =
   inherit animal (mSymbol, repLen)
 
   member this.tick () : moose option =
+    // 
+    
+    
     None // Intentionally left blank. Insert code that updates the moose's age and optionally an offspring.
 
 /// A wolf is an animal with a hunger counter
@@ -47,7 +50,16 @@ type wolf (repLen : int, hungLen : int) =
   member this.resetHunger () =
     _hunger <- hungLen
   member this.tick () : wolf option =
+    // Rækkefølge?
+    // Hvis ved siden af elg -> spis elg og flyt til den plads
+    // Ellers kald updateHunger og fortsæt:
+    // Ellers hvis _reproduction = 0 -> lav ny wolf og resetReproduction ()
+    // Ellers flyt et felt
+
+    
+    
     None // Intentionally left blank. Insert code that updates the wolf's age and optionally an offspring.
+
 
 /// A board is a chess-like board implicitly representedy by its width and coordinates of the animals.
 type board =
@@ -93,6 +105,10 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
   member this.board = _board
   member this.tick () = 
     () // Intentionally left blank. Insert code that process animals here.
+    // Udfør tick for moose og wolf for alle dyr - List.map eller sådan
+    // 
+
+
   override this.ToString () =
     let arr = draw _board
     let mutable ret = "  "
