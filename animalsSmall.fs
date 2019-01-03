@@ -9,6 +9,11 @@ let wSymbol : symbol = 'w'
 let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
+let getNeighbourFeilds (pos : position) : position list =
+  let xc = fst pos
+  let yc = snd pos
+  [(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)]
+
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
   let mutable _reproduction = rnd.Next(1,repLen)
@@ -32,11 +37,12 @@ type moose (repLen : int) =
   inherit animal (mSymbol, repLen)
 
   member this.tick () : moose option =
-    // 
+    // Rækkefølge:
+    // Først reproducer hvis relevant
+    // Ellers flyt til tilfældigt felt
     
     
     None // Intentionally left blank. Insert code that updates the moose's age and optionally an offspring.
-
 /// A wolf is an animal with a hunger counter
 type wolf (repLen : int, hungLen : int) =
   inherit animal (wSymbol, repLen)
@@ -50,12 +56,11 @@ type wolf (repLen : int, hungLen : int) =
   member this.resetHunger () =
     _hunger <- hungLen
   member this.tick () : wolf option =
-    // Rækkefølge?
-    // Hvis ved siden af elg -> spis elg og flyt til den plads
-    // Ellers kald updateHunger og fortsæt:
-    // Ellers hvis _reproduction = 0 -> lav ny wolf og resetReproduction ()
-    // Ellers flyt et felt
-
+    // Rækkefølge:
+    // Først reproducer hvis relevant
+    // Ellers spis elg hvis muligt
+    // Ellers flyt
+    // opdater sult og formeringstæller, hvis sult = 0 slet ulv
     
     
     None // Intentionally left blank. Insert code that updates the wolf's age and optionally an offspring.
