@@ -120,8 +120,6 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
 
   override this.ToString () =
     let arr = draw _board
-    let testSymbol = getSymbolForPosition (2,3) arr
-    printfn "%A" testSymbol
     let mutable ret = "  "
     for j = 0 to _board.width-1 do
       ret <- ret + string (j % 10) + " "
