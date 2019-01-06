@@ -9,18 +9,36 @@ let wSymbol : symbol = 'w'
 let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
-let getNeighbourFields (pos : position) : position [] =
-  let xc = fst pos
-  let yc = snd pos
-  [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
+let getNeighbourFields (pos : position) (boardWidth: int) : position [] =
+  let xc = snd pos
+  let yc = fst pos
+  if xc = 0 && yc = 0 then
+    [|(xc,yc+1);(xc+1,yc+1);(xc+1,yc)|]
+  elif xc = boardWidth-1 && yc = boardWidth-1 then
+    [|(yc-1,xc-1);(yc,xc-1);(yc-1,xc)|]
+  elif xc = boardWidth-1 && yc = 0 then
+    [|(yc,xc-1);(yc+1,xc-1);(yc+1,xc)|]
+  elif xc = 0 && yc = boardWidth-1 then
+    [|(yc-1,xc);(yc,xc+1);(yc-1,xc+1)|]
+
+  elif xc = 0 && yc <> 0 && yc <> boardWidth-1 then
+    [|(yc-1,xc);(yc-1,xc+1);(yc,xc+1);(yc+1,xc+1);(yc+1,xc)|]
+  elif xc = boardWidth-1 && yc <> 0 && yc <> boardWidth-1 then
+    [|(yc-1,xc);(yc-1,xc-1);(yc,xc-1);(yc+1,xc-1);(yc+1,xc)|]
+  elif yc = 0 && xc <> 0 && xc <> boardWidth-1 then
+    [|(yc,xc-1);(yc+1,xc-1);(yc+1,xc);(yc+1,xc+1);(yc,xc+1)|]
+  elif yc = boardWidth-1 && xc <> 0 && xc <> boardWidth-1 then
+    [|(yc,xc-1);(yc-1,xc-1);(yc-1,xc);(yc-1,xc+1);(yc,xc+1)|]
+  else
+    [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
   // TODO check om pos er på en kant af board og udfør funktion af hensyn til det
 
 let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
   arr.[fst pos, snd pos]
 
 /// Returns an array of type neighbour with information about the surrounding fields of a given position in a 2D array
-let getNeighbourSymbols (pos: position) (arr: symbol [,]) : neighbour [] =
-  let neighbourFields = getNeighbourFields pos
+let getNeighbourSymbols (pos: position) (arr: symbol [,]) (boardWidth: int): neighbour [] =
+  let neighbourFields = getNeighbourFields pos boardWidth
   let symbolArray = Array.map (fun x -> getSymbolFromPosition x arr) neighbourFields
   Array.zip neighbourFields symbolArray
 
@@ -62,12 +80,12 @@ type moose (repLen : int) =
         [||]
       
     if this.reproduction = 0 && emptyFields.Length <> 0 then
-      let newMoose = moose (repLen)
-      newMoose.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
+      let newMoose = new moose(repLen)
+      newMoose.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
       this.resetReproduction ()
       Some newMoose
     elif emptyFields.Length <> 0 then
-      this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
+      this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
       this.updateReproduction ()
       None
     else
@@ -90,7 +108,40 @@ type wolf (repLen : int, hungLen : int) =
       this.position <- None // Starve to death
   member this.resetHunger () =
     _hunger <- hungLen
-  member this.tick () : wolf option =
+  member this.tick (neighbours: neighbour []) : wolf option =
+    let emptyFields =
+      if (availableSymbolField neighbours eSymbol).IsSome then
+        (availableSymbolField neighbours eSymbol).Value
+      else
+        [||]
+    let mooseFields =
+      if (availableSymbolField neighbours mSymbol).IsSome then
+        (availableSymbolField neighbours mSymbol).Value
+      else
+        [||]
+    
+    if this.reproduction = 0 && emptyFields.Length <> 0 then
+      let newWolf = new wolf(repLen, hungLen)
+      newWolf.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
+      newWolf.resetHunger ()
+      newWolf.resetReproduction ()
+      this.resetReproduction ()
+      this.updateHunger ()
+      Some newWolf
+
+    elif this.reproduction = 0 && emptyFields.Length = 0 && mooseFields.Length <> 0 then
+      let moosePosition = fst mooseFields.[rnd.Next(0,(mooseFields.Length-1))]
+
+      
+      None
+    
+    else
+      None
+    
+
+
+    
+    
     // Rækkefølge:
     // Først reproducer hvis relevant
     // Ellers spis elg hvis muligt
@@ -98,7 +149,7 @@ type wolf (repLen : int, hungLen : int) =
     // opdater sult og formeringstæller, hvis sult = 0 slet ulv
     
     
-    None // Intentionally left blank. Insert code that updates the wolf's age and optionally an offspring.
+    // Intentionally left blank. Insert code that updates the wolf's age and optionally an offspring.
 
 
 /// A board is a chess-like board implicitly representedy by its width and coordinates of the animals.
@@ -145,7 +196,15 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
   member this.board = _board
   member this.array = draw _board
   member this.tick () = 
-    () // Intentionally left blank. Insert code that process animals here.
+    for m in _board.moose do
+      let position = m.position.Value
+      let neighbours = getNeighbourSymbols position (draw _board) _board.width
+      let mTick = m.tick(neighbours)
+      if mTick.IsSome then
+        _board.moose<- _board.moose @ [mTick.Value]
+
+
+    // Intentionally left blank. Insert code that process animals here.
     // Udfør tick for moose og wolf for alle dyr - List.map eller sådan
     // 
 

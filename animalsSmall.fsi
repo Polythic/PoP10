@@ -5,6 +5,7 @@ type symbol = char
 /// A position on a board
 type position = int * int
 /// Base class for all animals. An animal has a position, age and a time to reproduce.
+type neighbour = position * symbol
 type animal =
   class
     /// <summary>Create a new animal represented with symbol symb and which reproduces every repLen ticks.</summary>
@@ -34,7 +35,7 @@ type moose =
     /// <param name="repLen">The number of ticks until a moose attempts to produce an offspring.</param>
     new : repLen:int -> moose
     /// Perform a tick for this moose, i.e., call updateReproduction.
-    member tick : unit -> moose option
+    member tick : neighbour [] -> moose option
   end
 /// A wolf is an animal with hunger and methods for updating its age and hunger and for reproducing offspring. If the wolf has not eaten in a specified number of ticks, then it is taken off the board.
 type wolf =
@@ -51,7 +52,7 @@ type wolf =
     /// Reduce the hunger counter by a tick. If hunger reaches 0, then the wolf is removed from the board.
     member updateHunger : unit -> unit
     /// Perform a tick for this wolf, i.e., call updateReproduction and updateHunger and possibly returns cub.
-    member tick : unit -> wolf option
+    member tick : neighbour [] -> wolf option
   end
 /// A square board with length width. The board is implicitly represented by its width and the coordinates in the animals.
 type board =
