@@ -9,7 +9,7 @@ let wSymbol : symbol = 'w'
 let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
-let getNeighbourFeilds (pos : position) : position array =
+let getNeighbourFeilds (pos : position) : position [] =
   let xc = fst pos
   let yc = snd pos
   [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
@@ -18,9 +18,11 @@ let getNeighbourFeilds (pos : position) : position array =
 let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
   arr.[fst pos, snd pos]
 
-let getNeighbourSymbols (pos: position) (arr: symbol [,]) : symbol array =
+let getNeighbourSymbols (pos: position) (arr: symbol [,]) : (position * symbol) [] =
   let neighbourFeilds = getNeighbourFeilds pos
-  
+  let symbolArray = Array.map (fun x -> getSymbolFromPosition x arr) neighbourFeilds
+  Array.zip neighbourFeilds symbolArray
+
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
   let mutable _reproduction = rnd.Next(1,repLen)
@@ -115,6 +117,7 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
   member this.size = boardWidth*boardWidth
   member this.count = _board.moose.Length + _board.wolves.Length
   member this.board = _board
+  member this.array = draw _board
   member this.tick () = 
     () // Intentionally left blank. Insert code that process animals here.
     // Udfør tick for moose og wolf for alle dyr - List.map eller sådan
