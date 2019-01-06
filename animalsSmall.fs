@@ -9,15 +9,18 @@ let wSymbol : symbol = 'w'
 let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
-let getNeighbourFeilds (pos : position) : position list =
+let getNeighbourFeilds (pos : position) : position array =
   let xc = fst pos
   let yc = snd pos
-  [(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)]
+  [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
   // TODO check om pos er på en kant af board og udfør funktion af hensyn til det
 
-let getSymbolForPosition (pos: position) (arr: symbol [,]) : symbol =
+let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
   arr.[fst pos, snd pos]
 
+let getNeighbourSymbols (pos: position) (arr: symbol [,]) : symbol array =
+  let neighbourFeilds = getNeighbourFeilds pos
+  
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
   let mutable _reproduction = rnd.Next(1,repLen)
