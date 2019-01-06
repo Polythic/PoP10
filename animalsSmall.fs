@@ -9,7 +9,7 @@ let wSymbol : symbol = 'w'
 let eSymbol : symbol = ' '
 let rnd = System.Random ()
 
-let getNeighbourFeilds (pos : position) : position [] =
+let getNeighbourFields (pos : position) : position [] =
   let xc = fst pos
   let yc = snd pos
   [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
@@ -20,17 +20,17 @@ let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
 
 /// Returns an array of type neighbour with information about the surrounding fields of a given position in a 2D array
 let getNeighbourSymbols (pos: position) (arr: symbol [,]) : neighbour [] =
-  let neighbourFeilds = getNeighbourFeilds pos
-  let symbolArray = Array.map (fun x -> getSymbolFromPosition x arr) neighbourFeilds
-  Array.zip neighbourFeilds symbolArray
+  let neighbourFields = getNeighbourFields pos
+  let symbolArray = Array.map (fun x -> getSymbolFromPosition x arr) neighbourFields
+  Array.zip neighbourFields symbolArray
 
-/// Returns an optional array of neighbours that hold the symbol ' '
-let availableEmptyFeild (arr: neighbour []) : neighbour [] option =
-  let emptySpaceArray = Array.filter (fun x -> snd x = ' ') arr
-  if emptySpaceArray.Length = 0 then
+/// Returns an optional array of neighbours that hold the symbol (sym)
+let availableSymbolField (arr: neighbour []) (sym: symbol) : neighbour [] option =
+  let symbolSpaceArray = Array.filter (fun x -> snd x = sym) arr
+  if symbolSpaceArray.Length = 0 then
     None
   else
-    Some emptySpaceArray
+    Some symbolSpaceArray
     
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
@@ -55,17 +55,29 @@ type moose (repLen : int) =
   inherit animal (mSymbol, repLen)
 
   member this.tick (neighbours: neighbour []) : moose option =
-    
-    if _reproduction = 0 && (availableEmptyFeild neighbours).IsSome = true then
-      let newMoose = new repLen
-      newMoose.position<-
-     
+    let emptyFields =
+      if (availableSymbolField neighbours eSymbol).IsSome then
+        (availableSymbolField neighbours eSymbol).Value
+      else
+        [||]
+      
+    if this.reproduction = 0 && emptyFields.Length <> 0 then
+      let newMoose = moose (repLen)
+      newMoose.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
+      this.resetReproduction ()
+      Some newMoose
+    elif emptyFields.Length <> 0 then
+      this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
+      this.updateReproduction ()
+      None
+    else
+      None
     // Rækkefølge:
     // Først reproducer hvis relevant
     // Ellers flyt til tilfældigt felt
     
     
-    None // Intentionally left blank. Insert code that updates the moose's age and optionally an offspring.
+    // Intentionally left blank. Insert code that updates the moose's age and optionally an offspring.
 /// A wolf is an animal with a hunger counter
 type wolf (repLen : int, hungLen : int) =
   inherit animal (wSymbol, repLen)
