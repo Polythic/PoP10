@@ -18,11 +18,20 @@ let getNeighbourFeilds (pos : position) : position [] =
 let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
   arr.[fst pos, snd pos]
 
-let getNeighbourSymbols (pos: position) (arr: symbol [,]) : (position * symbol) [] =
+/// Returns an array of type neighbour with information about the surrounding fields of a given position in a 2D array
+let getNeighbourSymbols (pos: position) (arr: symbol [,]) : neighbour [] =
   let neighbourFeilds = getNeighbourFeilds pos
   let symbolArray = Array.map (fun x -> getSymbolFromPosition x arr) neighbourFeilds
   Array.zip neighbourFeilds symbolArray
 
+/// Returns an optional array of neighbours that hold the symbol ' '
+let availableEmptyFeild (arr: neighbour []) : neighbour [] option =
+  let emptySpaceArray = Array.filter (fun x -> snd x = ' ') arr
+  if emptySpaceArray.Length = 0 then
+    None
+  else
+    Some emptySpaceArray
+    
 /// An animal is a base class. It has a position and a reproduction counter.
 type animal (symb : symbol, repLen : int) =
   let mutable _reproduction = rnd.Next(1,repLen)
@@ -45,7 +54,12 @@ type animal (symb : symbol, repLen : int) =
 type moose (repLen : int) =
   inherit animal (mSymbol, repLen)
 
-  member this.tick () : moose option =
+  member this.tick (neighbours: neighbour []) : moose option =
+    
+    if _reproduction = 0 && (availableEmptyFeild neighbours).IsSome = true then
+      let newMoose = new repLen
+      newMoose.position<-
+     
     // Rækkefølge:
     // Først reproducer hvis relevant
     // Ellers flyt til tilfældigt felt
