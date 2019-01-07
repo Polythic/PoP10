@@ -30,8 +30,7 @@ let getNeighbourFields (pos : position) (boardWidth: int) : position [] =
   elif yc = boardWidth-1 && xc <> 0 && xc <> boardWidth-1 then
     [|(yc,xc-1);(yc-1,xc-1);(yc-1,xc);(yc-1,xc+1);(yc,xc+1)|]
   else
-    [|(xc-1,yc-1);(xc-1,yc);(xc-1,yc+1);(xc,yc+1);(xc+1,yc+1);(xc+1,yc);(xc+1,yc-1);(xc-1,yc)|]
-  // TODO check om pos er på en kant af board og udfør funktion af hensyn til det
+    [|(yc-1,xc-1);(yc,xc-1);(yc+1,xc-1);(yc+1,xc);(yc+1,xc+1);(yc,xc+1);(yc-1,xc+1);(yc,xc-1)|]
 
 let getSymbolFromPosition (pos: position) (arr: symbol [,]) : symbol =
   arr.[fst pos, snd pos]
@@ -81,14 +80,15 @@ type moose (repLen : int) =
       
     if this.reproduction = 0 && emptyFields.Length <> 0 then
       let newMoose = new moose(repLen)
-      newMoose.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
+      newMoose.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
       this.resetReproduction ()
       Some newMoose
     elif emptyFields.Length <> 0 then
-      this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
+      this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
       this.updateReproduction ()
       None
     else
+      this.updateReproduction ()
       None
     // Rækkefølge:
     // Først reproducer hvis relevant
@@ -122,35 +122,38 @@ type wolf (repLen : int, hungLen : int) =
     
     if this.reproduction = 0 && emptyFields.Length <> 0 then
       let newWolf = new wolf(repLen, hungLen)
-      newWolf.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length-1))]))
-      newWolf.resetHunger ()
-      newWolf.resetReproduction ()
+      newWolf.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
       this.resetReproduction ()
       this.updateHunger ()
       Some newWolf
 
     elif this.reproduction = 0 && emptyFields.Length = 0 && mooseFields.Length <> 0 then
-      let moosePosition = fst mooseFields.[rnd.Next(0,(mooseFields.Length-1))]
+      let moosePosition = fst mooseFields.[rnd.Next(0,(mooseFields.Length))]
+      this.position<- Some moosePosition
+      this.resetHunger ()
+      None
 
-      
+    elif this.reproduction = 0 && emptyFields.Length = 0 && mooseFields.Length = 0 then
+      this.updateHunger ()
+      None
+
+    elif this.reproduction <> 0 && mooseFields.Length <> 0 then
+      let moosePosition = fst mooseFields.[rnd.Next(0,(mooseFields.Length))]
+      this.position<-Some moosePosition
+      this.resetHunger ()
+      this.updateReproduction ()
       None
     
+    elif this.reproduction <> 0 && mooseFields.Length = 0 && emptyFields.Length <> 0 then
+      this.position<- Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
+      this.updateReproduction ()
+      this.updateHunger ()
+      None
+
     else
+      this.updateReproduction ()
+      this.updateHunger ()
       None
-    
-
-
-    
-    
-    // Rækkefølge:
-    // Først reproducer hvis relevant
-    // Ellers spis elg hvis muligt
-    // Ellers flyt
-    // opdater sult og formeringstæller, hvis sult = 0 slet ulv
-    
-    
-    // Intentionally left blank. Insert code that updates the wolf's age and optionally an offspring.
-
 
 /// A board is a chess-like board implicitly representedy by its width and coordinates of the animals.
 type board =
@@ -159,7 +162,7 @@ type board =
    mutable wolves : wolf list;}
 
 /// An environment is a chess-like board with all animals and implenting all rules.
-type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : int, wolvesRepLen : int, wolvesHungLen : int, verbose : bool) =
+type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : int, wolvesRepLen : int, wolvesHungLen : int) =
   let _board : board = {
     width = boardWidth;
     moose = List.init NMooses (fun i -> moose(mooseRepLen));
@@ -187,15 +190,21 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
 
   // populate the board with animals placed at random.
   do for m in _board.moose do
-       m.position <- Some (anyEmptyField _board)
+        m.position <- Some (anyEmptyField _board)
   do for w in _board.wolves do
-       w.position <- Some (anyEmptyField _board)
+        w.position <- Some (anyEmptyField _board)
 
   member this.size = boardWidth*boardWidth
   member this.count = _board.moose.Length + _board.wolves.Length
   member this.board = _board
   member this.array = draw _board
   member this.tick () = 
+    let rec remove index list =
+      match index, list with
+      | 0, x::xs -> xs
+      | i, x::xs -> x::remove (index - 1) xs
+      | i, [] -> failwith "Index out of range"
+    
     for m in _board.moose do
       let position = m.position.Value
       let neighbours = getNeighbourSymbols position (draw _board) _board.width
@@ -203,12 +212,27 @@ type environment (boardWidth : int, NMooses : int, mooseRepLen : int, NWolves : 
       if mTick.IsSome then
         _board.moose<- _board.moose @ [mTick.Value]
 
+    for w in _board.wolves do
+      let position = w.position.Value
+      let neighbours = getNeighbourSymbols position (draw _board) _board.width
+      let wTick = w.tick(neighbours)
+      if wTick.IsSome then
+        _board.wolves<- _board.wolves @ [wTick.Value]
+      for m in _board.moose do
+        if m.position = w.position then
+          m.position<-None
+          let mooseIndex = List.findIndex (fun x -> x = m) _board.moose
+          _board.moose<- remove mooseIndex _board.moose
+          //if verbose = true then printfn "Moose removed from board"
+      if w.position = None then
+        let wolfIndex = List.findIndex (fun x -> x = w) _board.wolves
+        _board.wolves<- remove wolfIndex _board.wolves
+        //if verbose = true then printfn "Wolf removed from board"
+
 
     // Intentionally left blank. Insert code that process animals here.
     // Udfør tick for moose og wolf for alle dyr - List.map eller sådan
-    // 
-
-
+  
   override this.ToString () =
     let arr = draw _board
     let mutable ret = "  "

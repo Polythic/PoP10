@@ -73,9 +73,9 @@ type environment =
     /// <param name="mooseRepLen">The number of ticks until a moose attempts to produce an offspring.</param>
     /// <param name="wolvesRepLen">The number of ticks until a wolf attempts to produce an offspring.</param>
     /// <param name="wolvesHungLen">The number of ticks since it last ate until a wolf dies.</param>
-    /// <param name="verbose">If the verbose flag is true, then messages are printed on screen at key events.</param>
+    // <param name="verbose">If the verbose flag is true, then messages are printed on screen at key events.</param>
     new : boardWidth:int * NMooses:int * mooseRepLen:int * NWolves:int *
-          wolvesRepLen:int * wolvesHungLen:int * verbose:bool -> environment
+          wolvesRepLen:int * wolvesHungLen:int (* * verbose:bool *) -> environment
     /// A board as a matrix of symbols for moose and wolves.
     override ToString : unit -> string
     /// The board.
