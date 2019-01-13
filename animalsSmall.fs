@@ -87,6 +87,8 @@ type moose (repLen : int) =
       this.position<-Some (fst (emptyFields.[rnd.Next(0,(emptyFields.Length))]))
       this.updateReproduction ()
       None
+    elif this.reproduction = 0 && emptyFields.Length = 0 then
+      None
     else
       this.updateReproduction ()
       None
