@@ -25,12 +25,12 @@ let runSimulationTicks (T: int) (filename: string) (n: int) (e: int) (felg: int)
     printfn "Creating file %A." filename
     if x = 1 then
         for i = 0 to T-1 do
-            isle.tick()
             let mooseCount = isle.board.moose.Length
             let wolfCount = isle.board.wolves.Length
             let textOutput = sprintf "Wolves: %A, Moose: %A" wolfCount mooseCount
             use file = File.AppendText filename
             file.WriteLine textOutput
+            isle.tick()
     else
         printfn "Exiting program."
 
