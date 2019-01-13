@@ -5,6 +5,7 @@ type symbol = char
 /// A position on a board
 type position = int * int
 /// Base class for all animals. An animal has a position, age and a time to reproduce.
+type neighbour = position * symbol
 type animal =
   class
     /// <summary>Create a new animal represented with symbol symb and which reproduces every repLen ticks.</summary>
@@ -34,7 +35,7 @@ type moose =
     /// <param name="repLen">The number of ticks until a moose attempts to produce an offspring.</param>
     new : repLen:int -> moose
     /// Perform a tick for this moose, i.e., call updateReproduction.
-    member tick : unit -> moose option
+    member tick : neighbour [] -> moose option
   end
 /// A wolf is an animal with hunger and methods for updating its age and hunger and for reproducing offspring. If the wolf has not eaten in a specified number of ticks, then it is taken off the board.
 type wolf =
@@ -51,7 +52,7 @@ type wolf =
     /// Reduce the hunger counter by a tick. If hunger reaches 0, then the wolf is removed from the board.
     member updateHunger : unit -> unit
     /// Perform a tick for this wolf, i.e., call updateReproduction and updateHunger and possibly returns cub.
-    member tick : unit -> wolf option
+    member tick : neighbour [] -> wolf option
   end
 /// A square board with length width. The board is implicitly represented by its width and the coordinates in the animals.
 type board =
@@ -72,9 +73,9 @@ type environment =
     /// <param name="mooseRepLen">The number of ticks until a moose attempts to produce an offspring.</param>
     /// <param name="wolvesRepLen">The number of ticks until a wolf attempts to produce an offspring.</param>
     /// <param name="wolvesHungLen">The number of ticks since it last ate until a wolf dies.</param>
-    /// <param name="verbose">If the verbose flag is true, then messages are printed on screen at key events.</param>
+    // <param name="verbose">If the verbose flag is true, then messages are printed on screen at key events.</param>
     new : boardWidth:int * NMooses:int * mooseRepLen:int * NWolves:int *
-          wolvesRepLen:int * wolvesHungLen:int * verbose:bool -> environment
+          wolvesRepLen:int * wolvesHungLen:int (* * verbose:bool *) -> environment
     /// A board as a matrix of symbols for moose and wolves.
     override ToString : unit -> string
     /// The board.
@@ -83,6 +84,8 @@ type environment =
     member count : int
     /// The positions on the board.
     member size : int
+    /// Get 2D array of board
+    member array : char[,]
     /// Perform a tick by performing all animal's ticks in random order. Animals perform the following actions: Calves and cubs are added if there is room in a neighbouring position. Wolves eat a random Moose in a neighbouring position. If animals do not give birth, eat or are eaten, then they move to an available neighbouring position.
     member tick : unit -> unit
   end
