@@ -32,14 +32,14 @@ printfn " Branch: 1e - %b" (getSymbolFromPosition testPosition5 test2DArray = 'd
 
 printfn "Whitebox test af getNeighbourSymbols"
 printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition1 test2DArray widthOfBoard = [|((4, 4), ' '); ((5, 4), ' '); ((6, 4), ' '); ((6, 5), ' '); ((6, 6), ' '); ((5, 6), ' '); ((4, 6), ' '); ((5, 4), ' ')|])
-printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition2 test2DArray widthOfBoard = [|((0, 1), ' '); ((1, 1), ' '); ((1, 0), ' ')|])
-printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition3 test2DArray widthOfBoard = [|((0, 8), ' '); ((1, 8), ' '); ((1, 9), ' ')|])
-printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition4 test2DArray widthOfBoard = [|((8, 8), ' '); ((9, 8), ' '); ((8, 9), ' ')|])
-printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition5 test2DArray widthOfBoard = [|((0, 4), ' '); ((1, 4), ' '); ((1, 5), ' '); ((1, 6), ' '); ((0, 6), ' ')|])
-printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition6 test2DArray widthOfBoard = [|((4, 9), ' '); ((4, 8), ' '); ((5, 8), ' '); ((6, 8), ' '); ((6, 9), ' ')|])
+printfn " Branch: 1b - %b" (getNeighbourSymbols testPosition2 test2DArray widthOfBoard = [|((0, 1), ' '); ((1, 1), ' '); ((1, 0), ' ')|])
+printfn " Branch: 1c - %b" (getNeighbourSymbols testPosition3 test2DArray widthOfBoard = [|((0, 8), ' '); ((1, 8), ' '); ((1, 9), ' ')|])
+printfn " Branch: 1d - %b" (getNeighbourSymbols testPosition4 test2DArray widthOfBoard = [|((8, 8), ' '); ((9, 8), ' '); ((8, 9), ' ')|])
+printfn " Branch: 1e - %b" (getNeighbourSymbols testPosition5 test2DArray widthOfBoard = [|((0, 4), ' '); ((1, 4), ' '); ((1, 5), ' '); ((1, 6), ' '); ((0, 6), ' ')|])
+printfn " Branch: 1f - %b" (getNeighbourSymbols testPosition6 test2DArray widthOfBoard = [|((4, 9), ' '); ((4, 8), ' '); ((5, 8), ' '); ((6, 8), ' '); ((6, 9), ' ')|])
 
 printfn "Whitebox test af availableSymbolField"
 printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'a' = Some [|((0, 0), 'a'); ((0, 1), 'a')|])
-printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'b' = Some [|((1, 1), 'b'); ((1, 2), 'b')|])
-printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'c' = Some [|((2, 2), 'c')|])
-printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'd' = None)
+printfn " Branch: 1b - %b" (availableSymbolField testNeighbour 'b' = Some [|((1, 1), 'b'); ((1, 2), 'b')|])
+printfn " Branch: 1c - %b" (availableSymbolField testNeighbour 'c' = Some [|((2, 2), 'c')|])
+printfn " Branch: 1d - %b" (availableSymbolField testNeighbour 'd' = None)
