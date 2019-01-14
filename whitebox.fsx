@@ -14,7 +14,6 @@ test2DArray.[0,9]<-'b'
 test2DArray.[9,9]<-'c'
 test2DArray.[0,5]<-'d'
 
-
 printfn "Whitebox test af getNeighbourFields" 
 printfn " Branch: 1a - %b" (getNeighbourFields testPosition1 widthOfBoard = [|(4, 4); (5, 4); (6, 4); (6, 5); (6, 6); (5, 6); (4, 6); (5, 4)|])
 printfn " Branch: 1b - %b" (getNeighbourFields testPosition2 widthOfBoard = [|(0, 1); (1, 1); (1, 0)|])
