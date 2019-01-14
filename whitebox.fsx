@@ -7,6 +7,7 @@ let testPosition4 = (9,9)
 let testPosition5 = (0,5)
 let testPosition6 = (5,9)
 let widthOfBoard = 10
+let testNeighbour = [|((0, 0), 'a'); ((0, 1), 'a'); ((1, 1), 'b'); ((1, 2), 'b'); ((2, 2), 'c')|]
 
 let mutable test2DArray = Array2D.create 10 10 ' '
 test2DArray.[0,0]<-'a'
@@ -36,10 +37,9 @@ printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition3 test2DArray widthO
 printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition4 test2DArray widthOfBoard = [|((8, 8), ' '); ((9, 8), ' '); ((8, 9), ' ')|])
 printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition5 test2DArray widthOfBoard = [|((0, 4), ' '); ((1, 4), ' '); ((1, 5), ' '); ((1, 6), ' '); ((0, 6), ' ')|])
 printfn " Branch: 1a - %b" (getNeighbourSymbols testPosition6 test2DArray widthOfBoard = [|((4, 9), ' '); ((4, 8), ' '); ((5, 8), ' '); ((6, 8), ' '); ((6, 9), ' ')|])
-(*
+
 printfn "Whitebox test af availableSymbolField"
-printfn " Branch: 1a - %b" (isHome testBoard1 Player1 7 = true)
-printfn " Branch: 1a - %b" (isHome testBoard1 Player1 7 = true)
-printfn " Branch: 1a - %b" (isHome testBoard1 Player1 7 = true)
-printfn " Branch: 1a - %b" (isHome testBoard1 Player1 7 = true)
-*)
+printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'a' = Some [|((0, 0), 'a'); ((0, 1), 'a')|])
+printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'b' = Some [|((1, 1), 'b'); ((1, 2), 'b')|])
+printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'c' = Some [|((2, 2), 'c')|])
+printfn " Branch: 1a - %b" (availableSymbolField testNeighbour 'd' = None)
