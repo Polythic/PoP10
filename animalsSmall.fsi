@@ -6,6 +6,15 @@ type symbol = char
 type position = int * int
 /// Base class for all animals. An animal has a position, age and a time to reproduce.
 type neighbour = position * symbol
+/// Get surrounding fields from position on board
+val getNeighbourFields: position -> int -> position []
+/// Get symbol of position from position on board
+val getSymbolFromPosition: position -> symbol [,] -> symbol
+/// Get surrounding symbols from position on board
+val getNeighbourSymbols: position -> symbol [,] -> int -> neighbour []
+/// Get list of specific symbols from lyst of symbols
+val availableSymbolField: neighbour [] -> symbol -> neighbour [] option
+
 type animal =
   class
     /// <summary>Create a new animal represented with symbol symb and which reproduces every repLen ticks.</summary>

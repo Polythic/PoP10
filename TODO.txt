@@ -1,6 +1,0 @@
-- Færddiggør .tick() for moose, wolf of enviroment
-- Lav et system til opdatering af placering for moose og wolves
-- Kode til at gemme oplysninger fra simuleringen i en fil
-- Tegene graf over eksperimenter i et program
-- Lav whitebox af biblioteket
-- Skriv rapport for opgaven
